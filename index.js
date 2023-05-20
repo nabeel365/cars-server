@@ -75,11 +75,30 @@ app.get('/toyDetails/:id', async (req, res) => {
 
     // Update ... 
 
+    // app.put('/toys/:id', async (req, res) => {
+    //   const id = req.params.id;
+    //   const toy = req.body;
+    //   console.log(id, toy);
+
+    //   const filter = { _id: new ObjectId(id) };
+    //   const options = { upsert: true };
+    //   const updatedToy = {
+    //     $set: {
+    //       price: toy.price,
+    //       quantity: toy.quantity,
+    //       description: toy.description
+    //     }
+    //   };
+
+    //   const result = await toysCollection.updateOne(filter, updatedToy, options);
+    //   res.send(result);
+    // });
+
     app.put('/toys/:id', async (req, res) => {
       const id = req.params.id;
       const toy = req.body;
       console.log(id, toy);
-
+    
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updatedToy = {
@@ -89,10 +108,17 @@ app.get('/toyDetails/:id', async (req, res) => {
           description: toy.description
         }
       };
-
+    
       const result = await toysCollection.updateOne(filter, updatedToy, options);
       res.send(result);
     });
+    
+    // Sort by ascending order based on price
+    const ascendingToys = await toysCollection.find().sort({ price: 1 }).toArray();
+    
+    // Sort by descending order based on price
+    const descendingToys = await toysCollection.find().sort({ price: -1 }).toArray();
+    
 
 
 
