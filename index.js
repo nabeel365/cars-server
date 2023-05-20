@@ -46,35 +46,68 @@ async function run() {
       const result = await types.toArray();
       res.send(result);
     });
-    
-
-    
-
-
-// POST ... 
-
-app.post('/toys', async (req, res) => {
-  const newToy = req.body;
-  console.log(newToy);
-
-  const result = await toysCollection.insertOne(newToy);
-  res.send(result)
-});
-
-
-// Update ... 
 
 
 
-// Delete ...
-app.delete('/toys/:id', async (req, res) => {
+
+app.get('/toyDetails/:id', async (req, res) => {
   const id = req.params.id;
-  console.log('delete', id);
-  const query = { _id: new ObjectId(id) };
+  console.log(id);
 
-  const result = await toysCollection.deleteOne(query);
+  const query = { _id: new ObjectId(id) };
+  const result = await toysCollection.find(query).toArray();
   res.send(result);
 });
+
+
+
+
+    // POST ... 
+
+    app.post('/toys', async (req, res) => {
+      const newToy = req.body;
+      console.log(newToy);
+
+      const result = await toysCollection.insertOne(newToy);
+      res.send(result)
+    });
+
+
+    // Update ... 
+
+    app.put('/toys/:id', async (req, res) => {
+      const id = req.params.id;
+      const toy = req.body;
+      console.log(id, toy);
+
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedToy = {
+        $set: {
+          price: toy.price,
+          quantity: toy.quantity,
+          description: toy.description
+        }
+      };
+
+      const result = await toysCollection.updateOne(filter, updatedToy, options);
+      res.send(result);
+    });
+
+
+
+
+
+
+    // Delete ...
+    app.delete('/toys/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log('delete', id);
+      const query = { _id: new ObjectId(id) };
+
+      const result = await toysCollection.deleteOne(query);
+      res.send(result);
+    });
 
 
 
@@ -85,7 +118,7 @@ app.delete('/toys/:id', async (req, res) => {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    
+
     // 
     // await client.close();
   }
@@ -95,8 +128,8 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Toy Cars Are Running')
-  })
+  res.send('Toy Cars Are Running')
+})
 
 
 app.listen(port, () => {
